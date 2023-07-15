@@ -4,10 +4,12 @@ import 'package:expense_tracking_app/constants.dart';
 class RoundedButton extends StatelessWidget {
   final String text;
   final void Function() onPress;
+  final bool? cancel;
 
   const RoundedButton({
     required this.text,
     required this.onPress,
+    this.cancel,
     super.key,
   });
 
@@ -18,14 +20,19 @@ class RoundedButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPress,
         style: ElevatedButton.styleFrom(
-            backgroundColor: kMainColor,
+            backgroundColor: cancel == null ? kMainColor : Colors.white,
+            side: BorderSide(
+                color: cancel == null ? Colors.transparent : kMainColor),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
               Radius.circular(20),
             ))),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: cancel == null ? Colors.white : Colors.black54),
         ),
       ),
     );

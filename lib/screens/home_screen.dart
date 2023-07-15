@@ -1,9 +1,8 @@
 import 'package:expense_tracking_app/constants.dart';
 import 'package:expense_tracking_app/models/expense_model.dart';
+import 'package:expense_tracking_app/screens/add_expense_screen.dart';
 import 'package:expense_tracking_app/widgets/expenses_list.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,12 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
       date: DateTime.now(),
       category: Category.leisure,
     ),
-    ExpenseModel(
-      title: 'Sport',
-      amount: 20.38,
-      date: DateTime.now(),
-      category: Category.sport,
-    ),
   ];
 
   @override
@@ -59,7 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
         backgroundColor: kMainColor,
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+              context: context, builder: (ctx) => const AddExpenseScreen());
+        },
         child: const Icon(
           Icons.add_rounded,
           size: 30,
