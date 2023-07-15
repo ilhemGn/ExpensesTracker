@@ -9,7 +9,7 @@ enum Category { food, work, study, sport, leisure }
 final categoryImages = {
   Category.food: 'assets/images/food.png',
   Category.work: 'assets/images/work.png',
-  Category.study: 'assets/images/books.png',
+  Category.study: 'assets/images/study.png',
   Category.sport: 'assets/images/sport.png',
   Category.leisure: 'assets/images/leisure.png',
 };

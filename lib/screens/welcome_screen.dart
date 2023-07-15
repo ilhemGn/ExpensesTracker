@@ -51,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w400),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 RoundedButton(
                   text: 'Get Started',
                   onPress: () {

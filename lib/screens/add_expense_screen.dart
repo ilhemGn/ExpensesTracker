@@ -6,7 +6,8 @@ import 'package:expense_tracking_app/widgets/input_field.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  const AddExpenseScreen({required this.addNewExpense, super.key});
+  final Function(ExpenseModel expense) addNewExpense;
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -16,6 +17,45 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
+  Category _selectedCategory = Category.food;
+
+  void _submittedForme() {
+    var enteredAmount = double.tryParse(_amountController.text);
+    bool invalidAmount = enteredAmount == null || enteredAmount <= 0;
+
+    if (_titleController.text.trim().isEmpty ||
+        invalidAmount ||
+        _selectedDate == null) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text(
+                  'Invalid input',
+                  textAlign: TextAlign.center,
+                ),
+                content: const Text(
+                  'Please make sure a valide title, amount, date and category was entered.',
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  RoundedButton(
+                      text: 'Okay',
+                      onPress: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ));
+      return;
+    }
+
+    widget.addNewExpense(ExpenseModel(
+        title: _titleController.text,
+        amount: enteredAmount,
+        date: _selectedDate!,
+        category: _selectedCategory));
+
+    Navigator.pop(context);
+  }
 
   @override
   void dispose() {
@@ -31,9 +71,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       child: Container(
         padding: const EdgeInsets.all(30),
         decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(30),
-          ),
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(30), topLeft: Radius.circular(30)),
           color: Colors.white,
         ),
         child: Column(
@@ -63,7 +102,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           ? 'No Selected Date'
                           : formatter.format(_selectedDate!),
                       style: const TextStyle(
-                          color: Color.fromARGB(255, 126, 143, 151)),
+                          color: Color.fromARGB(255, 133, 168, 151)),
                     ),
                     IconButton(
                         onPressed: () async {
@@ -83,30 +122,50 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         icon: const Icon(
                           FontAwesomeIcons.solidCalendarDays,
                           size: 20,
-                          color: Colors.blueGrey,
+                          color: kMainColor,
                         ))
                   ],
                 )
               ],
             ),
             const SizedBox(height: 20),
+            DropdownButtonFormField(
+              value: _selectedCategory,
+              decoration: const InputDecoration(
+                  filled: true,
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(20)))),
+              items: Category.values
+                  .map((category) => DropdownMenuItem(
+                      value: category,
+                      child: Text(category.name.toUpperCase())))
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  _selectedCategory = value;
+                });
+              },
+            ),
+            const SizedBox(height: 30),
             Row(
               children: [
                 Expanded(
                   child: RoundedButton(
                     text: 'Cancel',
-                    onPress: () {},
+                    onPress: () {
+                      Navigator.pop(context);
+                    },
                     cancel: true,
                   ),
                 ),
                 const Spacer(),
                 Expanded(
-                    child: RoundedButton(
-                        text: 'Add',
-                        onPress: () {
-                          print(_titleController.text);
-                          print(_amountController.text);
-                        })),
+                    child:
+                        RoundedButton(text: 'Add', onPress: _submittedForme)),
               ],
             )
           ],

@@ -28,10 +28,9 @@ class InputField extends StatelessWidget {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: const Color.fromARGB(255, 239, 239, 239),
         hintText: hintText,
         hintStyle: const TextStyle(
-            color: Color.fromARGB(255, 191, 191, 191),
+            color: Color.fromARGB(255, 221, 220, 220),
             fontSize: 16,
             fontWeight: FontWeight.w400),
         label: Text(
