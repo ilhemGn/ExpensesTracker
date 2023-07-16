@@ -78,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           showModalBottomSheet(
               //isScrollControlled: true,
+              useSafeArea: true,
               context: context,
               builder: (ctx) => AddExpenseScreen(
                     addNewExpense: _addExpense,

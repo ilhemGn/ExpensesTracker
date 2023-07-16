@@ -1,9 +1,18 @@
 import 'package:expense_tracking_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracking_app/screens/welcome_screen.dart';
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  //To locking device orientation in portrai up mode only
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((val) => runApp(const MyApp()));
+
+  //if you want to allow portrait down we should remove 
+  //this part of code and use Media Query to get available
+  //space in width and high then we can change the widget 
+  //depending on available space device.
 }
 
 class MyApp extends StatelessWidget {
