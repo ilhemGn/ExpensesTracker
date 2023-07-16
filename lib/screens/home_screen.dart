@@ -1,5 +1,6 @@
 import 'package:expense_tracking_app/models/expense_model.dart';
 import 'package:expense_tracking_app/screens/add_expense_screen.dart';
+import 'package:expense_tracking_app/data/expenses_data.dart';
 import 'package:expense_tracking_app/widgets/chart/char.dart';
 import 'package:expense_tracking_app/widgets/expenses_list.dart';
 import 'package:flutter/material.dart';
@@ -12,39 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<ExpenseModel> expensesList = [
-    ExpenseModel(
-      title: 'Flutter course',
-      amount: 19.99,
-      date: DateTime.now(),
-      category: Category.study,
-    ),
-    ExpenseModel(
-      title: 'Sport',
-      amount: 20.38,
-      date: DateTime.now(),
-      category: Category.sport,
-    ),
-    ExpenseModel(
-      title: 'Flutter course',
-      amount: 19.99,
-      date: DateTime.now(),
-      category: Category.food,
-    ),
-    ExpenseModel(
-      title: 'Sport',
-      amount: 20.38,
-      date: DateTime.now(),
-      category: Category.work,
-    ),
-    ExpenseModel(
-      title: 'Flutter course',
-      amount: 19.99,
-      date: DateTime.now(),
-      category: Category.leisure,
-    ),
-  ];
-
   void _addExpense(ExpenseModel expense) {
     setState(() {
       expensesList.add(expense);
