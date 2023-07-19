@@ -9,18 +9,19 @@ import 'package:expense_tracking_app/widgets/input_field.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({required this.addNewExpense, super.key});
-  final Function(ExpenseModel expense) addNewExpense;
+  const AddExpenseScreen({super.key});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
 }
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  var _enteredTitle = '';
+  var _enteredAmount = '';
   DateTime? _selectedDate;
   Category _selectedCategory = Category.food;
+
+  final _formKey = GlobalKey<FormState>();
 
   void _showDialog() {
     if (Platform.isAndroid) {
@@ -28,11 +29,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           context: context,
           builder: (context) => AlertDialog(
                 title: const Text(
-                  'Invalid input',
+                  'Reset form?',
                   textAlign: TextAlign.center,
                 ),
                 content: const Text(
-                  'Please make sure a valide title, amount, date and category was entered.',
+                  'Do you want to rest this form',
                   textAlign: TextAlign.center,
                 ),
                 actions: [
@@ -40,7 +41,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text('Okay'))
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _formKey.currentState!.reset();
+                      },
+                      child: const Text('Confirm')),
                 ],
               ));
     } else {
@@ -48,11 +55,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           context: context,
           builder: (context) => CupertinoAlertDialog(
                 title: const Text(
-                  'Invalid input',
+                  'Reset form?',
                   textAlign: TextAlign.center,
                 ),
                 content: const Text(
-                  'Please make sure a valide title, amount, date and category was entered.',
+                  'Do you want to rest this form',
                   textAlign: TextAlign.center,
                 ),
                 actions: [
@@ -60,37 +67,29 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text('Okay'))
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _formKey.currentState!.reset();
+                      },
+                      child: const Text('Confirm')),
                 ],
               ));
     }
   }
 
-  void _submittedForme() {
-    var enteredAmount = double.tryParse(_amountController.text);
-    bool invalidAmount = enteredAmount == null || enteredAmount <= 0;
-
-    if (_titleController.text.trim().isEmpty ||
-        invalidAmount ||
-        _selectedDate == null) {
-      _showDialog();
-      return;
+  void _submittedForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      Navigator.pop(
+          context,
+          ExpenseModel(
+              title: _enteredTitle,
+              amount: double.parse(_enteredAmount),
+              date: _selectedDate!,
+              category: _selectedCategory));
     }
-
-    widget.addNewExpense(ExpenseModel(
-        title: _titleController.text,
-        amount: enteredAmount,
-        date: _selectedDate!,
-        category: _selectedCategory));
-
-    Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _amountController.dispose();
-    super.dispose();
   }
 
   @override
@@ -111,101 +110,128 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             color: Colors.white,
           ),
-          child: Column(
-            children: [
-              InputField(
-                  controller: _titleController,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                InputField(
                   hintText: 'Expense Details',
-                  labelText: 'Title'),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: InputField(
-                        controller: _amountController,
+                  labelText: 'Title',
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        value.trim().length <= 1 ||
+                        value.trim().length > 50) {
+                      return 'Must be between 1 & 50 characteres';
+                    }
+
+                    return null;
+                  },
+                  onSave: (value) {
+                    _enteredTitle = value!;
+                  },
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: InputField(
                         keyboardType: TextInputType.number,
                         prefixText: '\$',
                         hintText: '0.00',
-                        labelText: 'Amount'),
-                  ),
-                  const SizedBox(width: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        _selectedDate == null
-                            ? 'No Selected Date'
-                            : formatter.format(_selectedDate!),
-                        style: const TextStyle(
-                            color: Color.fromARGB(255, 133, 168, 151)),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            final now = DateTime.now();
-                            final firstdate =
-                                DateTime(now.year - 1, now.month, now.day);
-                            DateTime? pickerDate = await showDatePicker(
-                                context: context,
-                                initialDate: now,
-                                firstDate: firstdate,
-                                lastDate: now);
+                        labelText: 'Amount',
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              double.tryParse(value) == null ||
+                              double.tryParse(value)! < 1) {
+                            return 'Must be a valid amount';
+                          }
 
-                            setState(() {
-                              _selectedDate = pickerDate;
-                            });
-                          },
-                          icon: const Icon(
-                            FontAwesomeIcons.solidCalendarDays,
-                            size: 20,
-                            color: kMainColor,
-                          ))
-                    ],
-                  )
-                ],
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField(
-                value: _selectedCategory,
-                decoration: const InputDecoration(
-                    filled: true,
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.all(Radius.circular(20)))),
-                items: Category.values
-                    .map((category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(category.name.toUpperCase())))
-                    .toList(),
-                onChanged: (value) {
-                  if (value == null) {
-                    return;
-                  }
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 30),
-              Row(
-                children: [
-                  Expanded(
-                    child: RoundedButton(
-                      text: 'Cancel',
-                      onPress: () {
-                        Navigator.pop(context);
-                      },
-                      cancel: true,
+                          return null;
+                        },
+                        onSave: (value) {
+                          _enteredAmount = value!;
+                        },
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  Expanded(
-                      child:
-                          RoundedButton(text: 'Add', onPress: _submittedForme)),
-                ],
-              ),
-              const SizedBox(height: 30),
-            ],
+                    const SizedBox(width: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          _selectedDate == null
+                              ? 'No Selected Date'
+                              : formatter.format(_selectedDate!),
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 133, 168, 151)),
+                        ),
+                        IconButton(
+                            onPressed: () async {
+                              final now = DateTime.now();
+                              final firstdate =
+                                  DateTime(now.year - 1, now.month, now.day);
+                              DateTime? pickerDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: now,
+                                  firstDate: firstdate,
+                                  lastDate: now);
+
+                              setState(() {
+                                _selectedDate = pickerDate;
+                              });
+                            },
+                            icon: const Icon(
+                              FontAwesomeIcons.solidCalendarDays,
+                              size: 20,
+                              color: kMainColor,
+                            ))
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField(
+                  value: _selectedCategory,
+                  decoration: const InputDecoration(
+                      filled: true,
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.all(Radius.circular(20)))),
+                  items: Category.values
+                      .map((category) => DropdownMenuItem(
+                          value: category,
+                          child: Text(category.name.toUpperCase())))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) {
+                      return;
+                    }
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    Expanded(
+                      child: RoundedButton(
+                        text: 'Cancel',
+                        onPress: _showDialog,
+                        cancel: true,
+                      ),
+                    ),
+                    const Spacer(),
+                    Expanded(
+                        child: RoundedButton(
+                            text: 'Add', onPress: _submittedForm)),
+                  ],
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),

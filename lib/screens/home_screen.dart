@@ -13,12 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  void _addExpense(ExpenseModel expense) {
-    setState(() {
-      expensesList.add(expense);
-    });
-  }
-
   void _removeExpense(ExpenseModel expense) {
     int expenseIndex = expensesList.indexOf(expense);
     setState(() {
@@ -43,14 +37,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
+        onPressed: () async {
+          var newExpense = await showModalBottomSheet(
               //isScrollControlled: true,
               useSafeArea: true,
               context: context,
-              builder: (ctx) => AddExpenseScreen(
-                    addNewExpense: _addExpense,
-                  ));
+              builder: (ctx) => const AddExpenseScreen());
+          setState(() {
+            expensesList.add(newExpense);
+          });
         },
         child: const Icon(
           Icons.add_rounded,
