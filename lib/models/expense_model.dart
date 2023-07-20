@@ -1,8 +1,8 @@
-import 'package:uuid/uuid.dart';
+//import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
 //To generate a unique string id
-const uuid = Uuid();
+//const uuid = Uuid();
 
 enum Category { food, work, study, sport, leisure }
 
@@ -24,11 +24,12 @@ class ExpenseModel {
   final Category category;
 
   ExpenseModel({
+    required this.id,
     required this.title,
     required this.amount,
     required this.date,
     required this.category,
-  }) : id = uuid.v4();
+  });
 
   String get formattedDate {
     return formatter.format(date);

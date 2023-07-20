@@ -3,7 +3,7 @@ import 'package:expense_tracking_app/constants.dart';
 
 class RoundedButton extends StatelessWidget {
   final String text;
-  final void Function() onPress;
+  final void Function()? onPress;
   final bool? cancel;
 
   const RoundedButton({

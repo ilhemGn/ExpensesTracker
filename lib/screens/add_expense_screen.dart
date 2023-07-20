@@ -1,12 +1,13 @@
 import 'dart:io';
-
 import 'package:expense_tracking_app/constants.dart';
+import 'package:expense_tracking_app/http/http_requests.dart';
 import 'package:expense_tracking_app/models/expense_model.dart';
 import 'package:expense_tracking_app/widgets/rounded_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracking_app/widgets/input_field.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -16,12 +17,13 @@ class AddExpenseScreen extends StatefulWidget {
 }
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
+  final _formKey = GlobalKey<FormState>();
   var _enteredTitle = '';
   var _enteredAmount = '';
-  DateTime? _selectedDate;
+  DateTime? _selectedDate = DateTime.now();
   Category _selectedCategory = Category.food;
 
-  final _formKey = GlobalKey<FormState>();
+  var _isSending = false;
 
   void _showDialog() {
     if (Platform.isAndroid) {
@@ -79,12 +81,26 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
 
-  void _submittedForm() {
+  void _submittedForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      setState(() {
+        _isSending = true;
+      });
+      postData(ExpenseModel(
+          id: '',
+          title: _enteredTitle,
+          amount: double.parse(_enteredAmount),
+          date: _selectedDate!,
+          category: _selectedCategory));
+
+      // if (!context.mounted) {
+      //   return;
+      // }
       Navigator.pop(
           context,
           ExpenseModel(
+              id: '',
               title: _enteredTitle,
               amount: double.parse(_enteredAmount),
               date: _selectedDate!,
@@ -219,14 +235,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                     Expanded(
                       child: RoundedButton(
                         text: 'Cancel',
-                        onPress: _showDialog,
+                        onPress: _isSending ? null : _showDialog,
                         cancel: true,
                       ),
                     ),
                     const Spacer(),
                     Expanded(
-                        child: RoundedButton(
-                            text: 'Add', onPress: _submittedForm)),
+                        child: _isSending
+                            ? SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02,
+                                width:
+                                    MediaQuery.of(context).size.height * 0.01,
+                                child: const LoadingIndicator(
+                                  indicatorType: Indicator.ballPulse,
+                                  colors: [kMainColor],
+                                ))
+                            : RoundedButton(
+                                text: 'Add',
+                                onPress: _isSending ? null : _submittedForm)),
                   ],
                 ),
                 const SizedBox(height: 30),
