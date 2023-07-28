@@ -11,6 +11,9 @@ Gain valuable insights into your spending habits with interactive charts that di
 #### Dummy Firebase Database Integration: 
 Securely store your expense data in a dummy Firebase database using REST API. Enjoy the benefits of cloud storage, making your data accessible across multiple devices while ensuring data privacy.
 
+## App Overview
+https://suar.me/px286
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
