@@ -2,6 +2,9 @@
 
 Expense Tracker is a user-friendly app built with Flutter that simplifies expenses management. Take control of your finances and stay organized by tracking your spending in different categories and visualizing it with insightful charts.
 
+[![Alt text](https://i.suar.me/E0mzl/l)]()   
+
+
 ### Key Features:
 
 #### Effortless Expense Entry: 
